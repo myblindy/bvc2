@@ -19,7 +19,10 @@ record IntegerLiteralToken(string Text, long Value) : NumericLiteralToken(Text, 
 {
     public IntegerLiteralToken(long Value) : this(Value.ToString(CultureInfo.InvariantCulture), Value) { }
 }
-record DoubleLiteralToken(string Text, double Value) : NumericLiteralToken(Text, TokenType.DoubleLiteral);
+record DoubleLiteralToken(string Text, double Value) : NumericLiteralToken(Text, TokenType.DoubleLiteral)
+{
+    public DoubleLiteralToken(double Value) : this(Value.ToString("R", CultureInfo.InvariantCulture), Value) { }
+}
 
 record IdentifierToken : Token
 {
