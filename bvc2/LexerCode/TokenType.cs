@@ -37,4 +37,5 @@ enum TokenType
     DotDot,
 
     VarKeyword,
+    EnumKeyword,
 }

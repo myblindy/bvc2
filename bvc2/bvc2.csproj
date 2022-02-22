@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="CodeGeneration\" />
-    <Folder Include="SemanticParser\" />
     <Folder Include="Support\" />
   </ItemGroup>
 

@@ -35,7 +35,7 @@ internal class Lexer
         // ["false"] = TokenType.FalseKeyword,
         ["var"] = TokenType.VarKeyword,
         // ["val"] = TokenType.ValKeyword,
-        // ["enum"] = TokenType.EnumKeyword,
+        ["enum"] = TokenType.EnumKeyword,
         // ["class"] = TokenType.ClassKeyword,
         // ["fun"] = TokenType.FunKeyword,
         // ["set"] = TokenType.SetKeyword,
