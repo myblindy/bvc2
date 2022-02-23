@@ -30,21 +30,21 @@ internal class Lexer
 
     static readonly Dictionary<string, TokenType> keywords = new()
     {
-        // ["if"] = TokenType.IfKeyword,
-        // ["true"] = TokenType.TrueKeyword,
-        // ["false"] = TokenType.FalseKeyword,
+        ["if"] = TokenType.IfKeyword,
+        ["true"] = TokenType.TrueKeyword,
+        ["false"] = TokenType.FalseKeyword,
         ["var"] = TokenType.VarKeyword,
-        // ["val"] = TokenType.ValKeyword,
+        ["val"] = TokenType.ValKeyword,
         ["enum"] = TokenType.EnumKeyword,
-        // ["class"] = TokenType.ClassKeyword,
-        // ["fun"] = TokenType.FunKeyword,
-        // ["set"] = TokenType.SetKeyword,
-        // ["get"] = TokenType.GetKeyword,
-        // ["return"] = TokenType.ReturnKeyword,
-        // ["vararg"] = TokenType.VarArgKeyword,
-        // ["static"] = TokenType.StaticKeyword,
-        // ["for"] = TokenType.ForKeyword,
-        // ["in"] = TokenType.InKeyword,
+        ["class"] = TokenType.ClassKeyword,
+        ["fun"] = TokenType.FunKeyword,
+        ["set"] = TokenType.SetKeyword,
+        ["get"] = TokenType.GetKeyword,
+        ["return"] = TokenType.ReturnKeyword,
+        ["vararg"] = TokenType.VarArgKeyword,
+        ["static"] = TokenType.StaticKeyword,
+        ["for"] = TokenType.ForKeyword,
+        ["in"] = TokenType.InKeyword,
     };
 
     public Transaction? StartTransaction() => transaction is null ? transaction = new(this) : null;

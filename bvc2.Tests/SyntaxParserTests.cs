@@ -54,7 +54,39 @@ class C
         {
             Children =
             {
-                new VariableSyntaxNode(VariableModifiers.None, "a", null, new LiteralExpressionSyntaxNode(10L)),
+                new ClassDeclarationSyntaxNode("C")
+                {
+                    Children =
+                    {
+                        new VariableSyntaxNode(VariableModifiers.None, "a", null, new LiteralExpressionSyntaxNode(10L)),
+                    }
+                }
+            }
+        });
+    }
+
+    [Fact]
+    public void PrimaryConstructor()
+    {
+        var parser = GetSourceSyntaxParser(@"
+class C(var i: Integer, val d: Double);
+");
+
+        Assert.Equal(parser.Parse(), new RootSyntaxNode()
+        {
+            Children =
+            {
+                new ClassDeclarationSyntaxNode("C")
+                {
+                    Children =
+                    {
+                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new[]
+                        {
+                            (VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Integer")),
+                            (VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Double")),
+                        })
+                    }
+                }
             }
         });
     }
