@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -12,8 +12,11 @@
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
     
+    <Using Include="bvc2.Common" />
+    
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
+    <Using Include="System.Collections.ObjectModel" />
     <Using Include="System.Globalization" />
     <Using Include="System.IO" />
     <Using Include="System.Text" />

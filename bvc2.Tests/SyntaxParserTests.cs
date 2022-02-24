@@ -1,4 +1,5 @@
-﻿using bvc2.SyntaxParserCode;
+﻿using bvc2.Common;
+using bvc2.SyntaxParserCode;
 
 namespace bvc2.Tests;
 

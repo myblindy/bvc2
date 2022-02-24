@@ -77,14 +77,6 @@ record FunctionDeclarationSyntaxNode(FunctionModifiers Modifiers, string Name, I
     }
 }
 
-[Flags]
-enum VariableModifiers
-{
-    None = 0,
-    Val = 1 << 0,
-    Static = 1 << 1,
-}
-
 record VariableSyntaxNode(VariableModifiers Modifiers, string Name, ExpressionSyntaxNode? ReturnType, ExpressionSyntaxNode? InitialValue, FunctionDeclarationSyntaxNode? Getter = null) : SyntaxNode;
 
 abstract record ExpressionSyntaxNode : SyntaxNode;
