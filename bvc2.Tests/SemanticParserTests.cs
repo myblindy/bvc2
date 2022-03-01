@@ -1,4 +1,5 @@
-﻿using bvc2.SemanticParserCode;
+﻿using bvc2.Common;
+using bvc2.SemanticParserCode;
 using bvc2.SyntaxParserCode;
 
 namespace bvc2.Tests;
@@ -26,18 +27,36 @@ enum E { V0, V1 = 5, V2, V3 = 0, V4 }
 ");
 
         var typeE = new EnumSemanticEntry("E");
-        typeE.Children.Add(new VariableSemanticEntry(EnumSyntaxNode.Modifiers, "V0", typeE, new LiteralSemanticExpression(0L)));
-        typeE.Children.Add(new VariableSemanticEntry(EnumSyntaxNode.Modifiers, "V1", typeE, new LiteralSemanticExpression(5L)));
-        typeE.Children.Add(new VariableSemanticEntry(EnumSyntaxNode.Modifiers, "V2", typeE, new LiteralSemanticExpression(6L)));
-        typeE.Children.Add(new VariableSemanticEntry(EnumSyntaxNode.Modifiers, "V3", typeE, new LiteralSemanticExpression(0L)));
-        typeE.Children.Add(new VariableSemanticEntry(EnumSyntaxNode.Modifiers, "V4", typeE, new LiteralSemanticExpression(1L)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V0", typeE, new LiteralSemanticExpression(0L)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V1", typeE, new LiteralSemanticExpression(5L)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V2", typeE, new LiteralSemanticExpression(6L)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V3", typeE, new LiteralSemanticExpression(0L)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V4", typeE, new LiteralSemanticExpression(1L)));
 
         Assert.Equal(parser.Parse(), new RootSemanticEntry()
         {
-            Children =
-            {
-                typeE
-            }
+            Children = { typeE }
+        });
+    }
+
+    [Fact]
+    public void BasicClass()
+    {
+        var parser = GetSourceSemanticParser(@"
+class C
+{
+    var a = 10 + 5;
+}
+");
+        var result = parser.Parse();
+
+        var typeC = new ClassSemanticEntry("C", Array.Empty<string>());
+        typeC.Children.Add(new VariableSemanticEntry(VariableModifiers.None, "a", result.FindType("Integer"),
+            new BinarySemanticExpression(new LiteralSemanticExpression(10L), LexerCode.TokenType.Plus, new LiteralSemanticExpression(5L))));
+
+        Assert.Equal(result, new RootSemanticEntry()
+        {
+            Children = { typeC }
         });
     }
 }

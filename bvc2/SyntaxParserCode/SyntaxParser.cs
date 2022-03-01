@@ -57,7 +57,7 @@ internal class SyntaxParser
                         else
                             ++nextValue;
 
-                        enumNode.Children.Add(new VariableSyntaxNode(EnumSyntaxNode.Modifiers, identifier.Text,
+                        enumNode.Children.Add(new VariableSyntaxNode(VariableModifiers.Enum, identifier.Text,
                             new IdentifierExpressionSyntaxNode(enumName), new LiteralExpressionSyntaxNode(nextValue - 1)));
 
                         if (MatchTokenTypes(TokenType.Comma) is null)
@@ -74,7 +74,7 @@ internal class SyntaxParser
                 while (MatchTokenTypes(TokenType.ClassKeyword) is { })
                 {
                     var name = ExpectTokenTypes(TokenType.Identifier).Text;
-                    var classDeclarationNode = new ClassDeclarationSyntaxNode(name);
+                    var classDeclarationNode = new ClassSyntaxNode(name);
 
                     // primary constructor
                     if (MatchTokenTypes(TokenType.OpenParentheses) is { })

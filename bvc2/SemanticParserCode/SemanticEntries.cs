@@ -1,10 +1,12 @@
-﻿using bvc2.SyntaxParserCode;
+﻿using bvc2.LexerCode;
+using bvc2.SyntaxParserCode;
 
 namespace bvc2.SemanticParserCode;
 
 abstract class SemanticEntry : IEquatable<SemanticEntry>
 {
     public string? Name { get; }
+    public bool Internal { get; init; }
     public SemanticEntry? Parent { get; set; }
     public SemanticEntryCollection Children { get; }
 
@@ -13,9 +15,12 @@ abstract class SemanticEntry : IEquatable<SemanticEntry>
 
     public TypeSemanticEntry? FindType(ExpressionSyntaxNode expressionSyntaxNode) => null;
 
+    public TypeSemanticEntry? FindType(string name) =>
+        Children.OfType<TypeSemanticEntry>().FirstOrDefault(t => t.Name == name) ?? Parent?.FindType(name);
+
     #region equality
     public bool Equals(SemanticEntry? other) =>
-        other is not null && Name == other.Name && Children.SequenceEqual(other.Children);
+        other is not null && Name == other.Name && Internal == other.Internal && Children.Where(c => !c.Internal).SequenceEqual(other.Children.Where(c => !c.Internal));
 
     public override bool Equals(object? obj) => Equals(obj as SemanticEntry);
 
@@ -23,8 +28,8 @@ abstract class SemanticEntry : IEquatable<SemanticEntry>
     {
         var hash = new HashCode();
         hash.Add(Name);
-        //hash.Add(Parent);
-        foreach (var child in Children)
+        hash.Add(Internal);
+        foreach (var child in Children.Where(c => !c.Internal))
             hash.Add(child);
         return hash.ToHashCode();
     }
@@ -36,7 +41,7 @@ abstract class SemanticEntry : IEquatable<SemanticEntry>
 
 class SemanticEntryCollection : Collection<SemanticEntry>
 {
-    SemanticEntry entry;
+    readonly SemanticEntry entry;
 
     public SemanticEntryCollection(SemanticEntry entry) =>
         this.entry = entry;
@@ -123,6 +128,25 @@ class EnumSemanticEntry : TypeSemanticEntry
     }
 }
 
+class ClassSemanticEntry : TypeSemanticEntry
+{
+    public ClassSemanticEntry(string name, string[] genericParameters) : base(name, genericParameters)
+    {
+    }
+
+    #region equality
+    public bool Equals(ClassSemanticEntry? other) => Equals((TypeSemanticEntry?)other);
+
+    public override bool Equals(object? obj) => Equals(obj as ClassSemanticEntry);
+
+    public override int GetHashCode() => base.GetHashCode();
+
+    public static bool operator ==(ClassSemanticEntry? a, ClassSemanticEntry? b) => a is not null && b is not null && a.Equals(b) || a is null && b is null;
+    public static bool operator !=(ClassSemanticEntry? a, ClassSemanticEntry? b) => !(a == b);
+    #endregion
+}
+
 abstract record SemanticExpression;
 
+record BinarySemanticExpression(SemanticExpression Left, TokenType Operator, SemanticExpression Right) : SemanticExpression;
 record LiteralSemanticExpression(object Value) : SemanticExpression;

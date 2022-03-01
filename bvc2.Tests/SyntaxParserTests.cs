@@ -1,5 +1,6 @@
 ﻿using bvc2.Common;
 using bvc2.SyntaxParserCode;
+using bvc2.SyntaxParserCode.TestSupport;
 
 namespace bvc2.Tests;
 
@@ -22,7 +23,7 @@ public class SyntaxParserTests
         var parser = GetSourceSyntaxParser(@"
 enum E { V0, V1, V2 = 5, V3, V4 = 1, V5 }
 ");
-        Assert.Equal(parser.Parse(), new RootSyntaxNode()
+        SyntaxNodeSimilarity.Assert(parser.Parse(), new RootSyntaxNode()
         {
             Children =
             {
@@ -30,12 +31,12 @@ enum E { V0, V1, V2 = 5, V3, V4 = 1, V5 }
                 {
                     Children =
                     {
-                        new VariableSyntaxNode(EnumSyntaxNode.Modifiers, "V0", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(0L)),
-                        new VariableSyntaxNode(EnumSyntaxNode.Modifiers, "V1", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(1L)),
-                        new VariableSyntaxNode(EnumSyntaxNode.Modifiers, "V2", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(5L)),
-                        new VariableSyntaxNode(EnumSyntaxNode.Modifiers, "V3", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(6L)),
-                        new VariableSyntaxNode(EnumSyntaxNode.Modifiers, "V4", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(1L)),
-                        new VariableSyntaxNode(EnumSyntaxNode.Modifiers, "V5", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(2L)),
+                        new VariableSyntaxNode(VariableModifiers.Enum, "V0", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(0L)),
+                        new VariableSyntaxNode(VariableModifiers.Enum, "V1", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(1L)),
+                        new VariableSyntaxNode(VariableModifiers.Enum, "V2", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(5L)),
+                        new VariableSyntaxNode(VariableModifiers.Enum, "V3", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(6L)),
+                        new VariableSyntaxNode(VariableModifiers.Enum, "V4", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(1L)),
+                        new VariableSyntaxNode(VariableModifiers.Enum, "V5", new IdentifierExpressionSyntaxNode("E"), new LiteralExpressionSyntaxNode(2L)),
                     }
                 }
             }
@@ -51,11 +52,11 @@ class C
     var a = 10;
 }
 ");
-        Assert.Equal(parser.Parse(), new RootSyntaxNode()
+        SyntaxNodeSimilarity.Assert(parser.Parse(), new RootSyntaxNode()
         {
             Children =
             {
-                new ClassDeclarationSyntaxNode("C")
+                new ClassSyntaxNode("C")
                 {
                     Children =
                     {
@@ -73,11 +74,11 @@ class C
 class C(var i: Integer, val d: Double);
 ");
 
-        Assert.Equal(parser.Parse(), new RootSyntaxNode()
+        SyntaxNodeSimilarity.Assert(parser.Parse(), new RootSyntaxNode()
         {
             Children =
             {
-                new ClassDeclarationSyntaxNode("C")
+                new ClassSyntaxNode("C")
                 {
                     Children =
                     {
@@ -90,5 +91,32 @@ class C(var i: Integer, val d: Double);
                 }
             }
         });
+    }
+
+
+    [Fact]
+    public void ShouldFail()
+    {
+        var parser = GetSourceSyntaxParser(@"
+class C(var i: Integer, val d: Double);
+");
+
+        Assert.Throws<Exception>(() => SyntaxNodeSimilarity.Assert(parser.Parse(), new RootSyntaxNode()
+        {
+            Children =
+            {
+                new ClassSyntaxNode("C")
+                {
+                    Children =
+                    {
+                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new[]
+                        {
+                            (VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Meep")),
+                            (VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Moop")),
+                        })
+                    }
+                }
+            }
+        }));
     }
 }

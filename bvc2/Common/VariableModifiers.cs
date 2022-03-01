@@ -6,4 +6,6 @@ enum VariableModifiers
     None = 0,
     Val = 1 << 0,
     Static = 1 << 1,
+
+    Enum = Val | Static,
 }
