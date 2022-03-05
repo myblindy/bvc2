@@ -1,6 +1,6 @@
 ﻿using bvc2.Common;
 using bvc2.SyntaxParserCode;
-using bvc2.SyntaxParserCode.TestSupport;
+using bvc2.BvcEntities.TestSupport;
 
 namespace bvc2.Tests;
 
@@ -82,10 +82,10 @@ class C(var i: Integer, val d: Double);
                 {
                     Children =
                     {
-                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new[]
+                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionArgument[]
                         {
-                            (VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Integer")),
-                            (VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Double")),
+                            new(VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Integer")),
+                            new(VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Double")),
                         })
                     }
                 }
@@ -101,7 +101,7 @@ class C(var i: Integer, val d: Double);
 class C(var i: Integer, val d: Double);
 ");
 
-        Assert.Throws<Exception>(() => SyntaxNodeSimilarity.Assert(parser.Parse(), new RootSyntaxNode()
+        Assert.Throws<AssertFailedException>(() => SyntaxNodeSimilarity.Assert(parser.Parse(), new RootSyntaxNode()
         {
             Children =
             {
@@ -109,10 +109,10 @@ class C(var i: Integer, val d: Double);
                 {
                     Children =
                     {
-                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new[]
+                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionArgument[]
                         {
-                            (VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Meep")),
-                            (VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Moop")),
+                            new(VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Meep")),
+                            new(VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Moop")),
                         })
                     }
                 }

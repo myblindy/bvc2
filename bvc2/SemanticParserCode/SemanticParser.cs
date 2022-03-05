@@ -26,7 +26,7 @@ internal class SemanticParser
         parent.Children.Add(enumEntry);
 
         foreach (VariableSyntaxNode child in node.Children)
-            enumEntry.Children.Add(new VariableSemanticEntry(child.Modifiers, child.Name, enumEntry, new LiteralSemanticExpression(GetSemanticExpression(child.InitialValue)!)));
+            enumEntry.Children.Add(new VariableSemanticEntry(child.Modifiers, child.Name, enumEntry, GetSemanticExpression(child.InitialValue)!));
     }
 
     static void ParseClassSyntaxNode(ClassSyntaxNode node, SemanticEntry parent)

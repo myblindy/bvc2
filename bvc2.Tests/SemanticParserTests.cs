@@ -1,6 +1,7 @@
 ﻿using bvc2.Common;
 using bvc2.SemanticParserCode;
 using bvc2.SyntaxParserCode;
+using bvc2.BvcEntities.TestSupport;
 
 namespace bvc2.Tests;
 
@@ -33,7 +34,7 @@ enum E { V0, V1 = 5, V2, V3 = 0, V4 }
         typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V3", typeE, new LiteralSemanticExpression(0L)));
         typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V4", typeE, new LiteralSemanticExpression(1L)));
 
-        Assert.Equal(parser.Parse(), new RootSemanticEntry()
+        SemanticEntrySimilarity.Assert(parser.Parse(), new RootSemanticEntry()
         {
             Children = { typeE }
         });
@@ -54,7 +55,7 @@ class C
         typeC.Children.Add(new VariableSemanticEntry(VariableModifiers.None, "a", result.FindType("Integer"),
             new BinarySemanticExpression(new LiteralSemanticExpression(10L), LexerCode.TokenType.Plus, new LiteralSemanticExpression(5L))));
 
-        Assert.Equal(result, new RootSemanticEntry()
+        SemanticEntrySimilarity.Assert(result, new RootSemanticEntry()
         {
             Children = { typeC }
         });

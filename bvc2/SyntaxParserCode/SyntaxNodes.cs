@@ -24,7 +24,9 @@ enum FunctionModifiers
     Static = 1 << 0,
 }
 
-record FunctionDeclarationSyntaxNode(FunctionModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode? ReturnType, (VariableModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode Type)[] Arguments, bool Internal = false)
+record FunctionArgument(VariableModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode Type);
+
+record FunctionDeclarationSyntaxNode(FunctionModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode? ReturnType, FunctionArgument[] Arguments, bool Internal = false)
     : BlockSyntaxNode
 {
     public const string PrimaryConstructorName = ".ctor";
