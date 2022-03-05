@@ -57,7 +57,7 @@ internal class SyntaxParser
                         else
                             ++nextValue;
 
-                        enumNode.Children.Add(new VariableSyntaxNode(EnumSyntaxNode.Modifiers, identifier.Text,
+                        enumNode.Children.Add(new VariableSyntaxNode(VariableModifiers.Enum, identifier.Text,
                             new IdentifierExpressionSyntaxNode(enumName), new LiteralExpressionSyntaxNode(nextValue - 1)));
 
                         if (MatchTokenTypes(TokenType.Comma) is null)
@@ -74,12 +74,12 @@ internal class SyntaxParser
                 while (MatchTokenTypes(TokenType.ClassKeyword) is { })
                 {
                     var name = ExpectTokenTypes(TokenType.Identifier).Text;
-                    var classDeclarationNode = new ClassDeclarationSyntaxNode(name);
+                    var classDeclarationNode = new ClassSyntaxNode(name);
 
                     // primary constructor
                     if (MatchTokenTypes(TokenType.OpenParentheses) is { })
                     {
-                        var args = new List<(VariableModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode Type)>();
+                        var args = new List<FunctionArgument>();
                         while (true)
                         {
                             if (args.Count > 0 && MatchTokenTypes(TokenType.Comma) is null)
@@ -92,7 +92,7 @@ internal class SyntaxParser
                             ExpectTokenTypes(TokenType.Colon);
                             var type = ParseIdentifierExpressionSyntaxNode()!;
 
-                            args.Add((BuildVariableModifiers(false, varTypeToken.Type is TokenType.ValKeyword), varName, type));
+                            args.Add(new(BuildVariableModifiers(false, varTypeToken.Type is TokenType.ValKeyword), varName, type));
                         }
                         ExpectTokenTypes(TokenType.CloseParentheses);
 
@@ -130,7 +130,7 @@ internal class SyntaxParser
                         (initialValue, initialValueIsGet) = (ParseExpression(), true);
                     else if (MatchTokenTypes(TokenType.OpenBrace) is { })
                     {
-                        ParseChildren(functionGet = new(FunctionModifiers.None, $"get_{name}", type, Array.Empty<(VariableModifiers, string, IdentifierExpressionSyntaxNode)>(), true), ParseContextType.Function);
+                        ParseChildren(functionGet = new(FunctionModifiers.None, $"get_{name}", type, Array.Empty<FunctionArgument>(), true), ParseContextType.Function);
                         ExpectTokenTypes(TokenType.CloseBrace);
                         needsSemiColon = false;
                     }
@@ -149,7 +149,7 @@ internal class SyntaxParser
 
                 foundAny = true;
                 if (functionGet is null && initialValue is not null && initialValueIsGet)
-                    functionGet = new(FunctionModifiers.None, $"get_{name}", type, Array.Empty<(VariableModifiers, string, IdentifierExpressionSyntaxNode)>(), true);
+                    functionGet = new(FunctionModifiers.None, $"get_{name}", type, Array.Empty<FunctionArgument>(), true);
 
                 if (functionGet?.Children.Count == 0)
                     functionGet.Children.Add(new ReturnStatementNode(initialValue!));

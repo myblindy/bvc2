@@ -27,6 +27,7 @@
   <ItemGroup>
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
     <Using Include="System.IO" />
     <Using Include="System.Linq" />
     <Using Include="System.Text" />

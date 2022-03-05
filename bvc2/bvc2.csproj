@@ -8,15 +8,16 @@
     <LangVersion>preview</LangVersion>
     <AnalysisMode>recommended</AnalysisMode>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
-    
+
     <Using Include="bvc2.Common" />
-    
+
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
     <Using Include="System.Collections.ObjectModel" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
     <Using Include="System.Globalization" />
     <Using Include="System.IO" />
     <Using Include="System.Text" />
@@ -25,6 +26,12 @@
   <ItemGroup>
     <Folder Include="CodeGeneration\" />
     <Folder Include="Support\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\bvc2.gen\bvc2.gen.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
