@@ -83,7 +83,19 @@ class ClassSemanticEntry : TypeSemanticEntry
     }
 }
 
-abstract record SemanticExpression;
+record FunctionSemanticParameter(VariableModifiers Modifiers, string Name, TypeSemanticEntry? Type);
+class FunctionSemanticEntry : TypeSemanticEntry
+{
+    public FunctionModifiers Modifiers { get; }
+    public TypeSemanticEntry? ReturnType { get; }
+    public ReadOnlyCollection<FunctionSemanticParameter> Parameters { get; }
 
-record BinarySemanticExpression(SemanticExpression Left, TokenType Operator, SemanticExpression Right) : SemanticExpression;
-record LiteralSemanticExpression(object Value) : SemanticExpression;
+    public FunctionSemanticEntry(FunctionModifiers modifiers, string name, string[] genericParameters, TypeSemanticEntry? returnType,
+        FunctionSemanticParameter[] parameters) : base(name, genericParameters) =>
+        (Modifiers, ReturnType, Parameters) = (modifiers, returnType, new(parameters));
+}
+
+abstract record SemanticExpression(TypeSemanticEntry? Type);
+
+record BinarySemanticExpression(SemanticExpression Left, TokenType Operator, SemanticExpression Right, TypeSemanticEntry? Type) : SemanticExpression(Type);
+record LiteralSemanticExpression(object Value, TypeSemanticEntry? Type) : SemanticExpression(Type);

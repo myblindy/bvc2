@@ -27,17 +27,20 @@ public class SemanticParserTests
 enum E { V0, V1 = 5, V2, V3 = 0, V4 }
 ");
 
-        var typeE = new EnumSemanticEntry("E");
-        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V0", typeE, new LiteralSemanticExpression(0L)));
-        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V1", typeE, new LiteralSemanticExpression(5L)));
-        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V2", typeE, new LiteralSemanticExpression(6L)));
-        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V3", typeE, new LiteralSemanticExpression(0L)));
-        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V4", typeE, new LiteralSemanticExpression(1L)));
+        var result = parser.Parse();
 
-        SemanticEntrySimilarity.Assert(parser.Parse(), new RootSemanticEntry()
+        var typeInteger = result.FindType("Integer");
+        var typeE = new EnumSemanticEntry("E");
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V0", typeE, new LiteralSemanticExpression(0L, typeInteger)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V1", typeE, new LiteralSemanticExpression(5L, typeInteger)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V2", typeE, new LiteralSemanticExpression(6L, typeInteger)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V3", typeE, new LiteralSemanticExpression(0L, typeInteger)));
+        typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V4", typeE, new LiteralSemanticExpression(1L, typeInteger)));
+
+        SemanticEntrySimilarity.Assert(new RootSemanticEntry()
         {
             Children = { typeE }
-        });
+        }, result);
     }
 
     [Fact]
@@ -51,13 +54,16 @@ class C
 ");
         var result = parser.Parse();
 
+        var typeInteger = result.FindType("Integer");
         var typeC = new ClassSemanticEntry("C", Array.Empty<string>());
-        typeC.Children.Add(new VariableSemanticEntry(VariableModifiers.None, "a", result.FindType("Integer"),
-            new BinarySemanticExpression(new LiteralSemanticExpression(10L), LexerCode.TokenType.Plus, new LiteralSemanticExpression(5L))));
+        typeC.Children.Add(new VariableSemanticEntry(VariableModifiers.None, "a", typeInteger,
+            new BinarySemanticExpression(
+                new LiteralSemanticExpression(10L, typeInteger), LexerCode.TokenType.Plus, new LiteralSemanticExpression(5L, typeInteger),
+                typeInteger)));
 
-        SemanticEntrySimilarity.Assert(result, new RootSemanticEntry()
+        SemanticEntrySimilarity.Assert(new RootSemanticEntry()
         {
             Children = { typeC }
-        });
+        }, result);
     }
 }

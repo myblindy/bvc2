@@ -82,7 +82,7 @@ class C(var i: Integer, val d: Double);
                 {
                     Children =
                     {
-                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionArgument[]
+                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionSyntaxParameter[]
                         {
                             new(VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Integer")),
                             new(VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Double")),
@@ -109,7 +109,7 @@ class C(var i: Integer, val d: Double);
                 {
                     Children =
                     {
-                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionArgument[]
+                        new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionSyntaxParameter[]
                         {
                             new(VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Meep")),
                             new(VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Moop")),
