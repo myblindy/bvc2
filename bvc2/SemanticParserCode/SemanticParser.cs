@@ -10,13 +10,21 @@ internal class SemanticParser
         this.rootSyntaxNode = rootSyntaxNode;
 
     [return: NotNullIfNotNull("expressionSyntaxNode")]
-    static SemanticExpression? GetSemanticExpression(ExpressionSyntaxNode? expressionSyntaxNode) =>
+    static SemanticExpression? GetSemanticExpression(ExpressionSyntaxNode? expressionSyntaxNode, SemanticEntry parent) =>
         expressionSyntaxNode switch
         {
             null => null,
             BinaryExpressionSyntaxNode binaryExpressionSyntaxNode => new BinarySemanticExpression(
-                GetSemanticExpression(binaryExpressionSyntaxNode.Left), binaryExpressionSyntaxNode.Operator, GetSemanticExpression(binaryExpressionSyntaxNode.Right)),
-            LiteralExpressionSyntaxNode literalExpressionSyntaxNode => new LiteralSemanticExpression(literalExpressionSyntaxNode.Value),
+                GetSemanticExpression(binaryExpressionSyntaxNode.Left, parent), binaryExpressionSyntaxNode.Operator, GetSemanticExpression(binaryExpressionSyntaxNode.Right, parent),
+                parent.FindType(expressionSyntaxNode)),
+            LiteralExpressionSyntaxNode literalExpressionSyntaxNode => new LiteralSemanticExpression(literalExpressionSyntaxNode.Value, literalExpressionSyntaxNode.Value switch
+            {
+                long => integerSemanticEntry,
+                string => stringSemanticEntry,
+                double => doubleSemanticEntry,
+                bool => booleanSemanticEntry,
+                _ => throw new NotImplementedException()
+            }),
             _ => throw new NotImplementedException(),
         };
 
@@ -26,7 +34,7 @@ internal class SemanticParser
         parent.Children.Add(enumEntry);
 
         foreach (VariableSyntaxNode child in node.Children)
-            enumEntry.Children.Add(new VariableSemanticEntry(child.Modifiers, child.Name, enumEntry, GetSemanticExpression(child.InitialValue)!));
+            enumEntry.Children.Add(new VariableSemanticEntry(child.Modifiers, child.Name, enumEntry, GetSemanticExpression(child.InitialValue, enumEntry)!));
     }
 
     static void ParseClassSyntaxNode(ClassSyntaxNode node, SemanticEntry parent)
@@ -38,7 +46,7 @@ internal class SemanticParser
     }
 
     static void ParseVariableSyntaxNode(VariableSyntaxNode node, SemanticEntry parent) =>
-        parent.Children.Add(new VariableSemanticEntry(node.Modifiers, node.Name, parent.FindType(node.ReturnType!), GetSemanticExpression(node.InitialValue)));
+        parent.Children.Add(new VariableSemanticEntry(node.Modifiers, node.Name, parent.FindType(node.ReturnType!), GetSemanticExpression(node.InitialValue, parent)));
 
     static void ParseChildren(ParentSyntaxNode node, SemanticEntry parent)
     {
@@ -59,7 +67,19 @@ internal class SemanticParser
             }
     }
 
-    static readonly ClassSemanticEntry integerSemanticEntry = new ClassSemanticEntry("Integer", Array.Empty<string>())
+    static readonly ClassSemanticEntry integerSemanticEntry = new("Integer", Array.Empty<string>())
+    {
+        Internal = true,
+        Children =
+        {
+            new FunctionSemanticEntry(FunctionModifiers.Static, "+", Array.Empty<string>(), integerSemanticEntry, new FunctionSemanticParameter[]
+            {
+                new(VariableModifiers.Val, "a", integerSemanticEntry),
+                new(VariableModifiers.Val, "b", integerSemanticEntry)
+            })
+        }
+    };
+    static readonly ClassSemanticEntry doubleSemanticEntry = new("Double", Array.Empty<string>())
     {
         Internal = true,
         Children =
@@ -67,7 +87,15 @@ internal class SemanticParser
 
         }
     };
-    static readonly ClassSemanticEntry doubleSemanticEntry = new ClassSemanticEntry("Double", Array.Empty<string>())
+    static readonly ClassSemanticEntry stringSemanticEntry = new("String", Array.Empty<string>())
+    {
+        Internal = true,
+        Children =
+        {
+
+        }
+    };
+    static readonly ClassSemanticEntry booleanSemanticEntry = new("Boolean", Array.Empty<string>())
     {
         Internal = true,
         Children =
@@ -79,6 +107,8 @@ internal class SemanticParser
     {
         root.Children.Add(integerSemanticEntry);
         root.Children.Add(doubleSemanticEntry);
+        root.Children.Add(stringSemanticEntry);
+        root.Children.Add(booleanSemanticEntry);
     }
 
     public SemanticEntry Parse()

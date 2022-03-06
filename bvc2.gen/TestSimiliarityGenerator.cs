@@ -45,12 +45,18 @@ class TestSimiliarityGenerator : IIncrementalGenerator
 
     static void AddSupportAsserts(StringBuilder sb)
     {
-        foreach (var type in new[] { "string?", "bool", "long", "double", "bvc2.SyntaxParserCode.FunctionModifiers", "bvc2.LexerCode.TokenType", "bvc2.Common.VariableModifiers" })
+        foreach (var type in new[] { "string?", "bool", "long", "double", "bvc2.Common.FunctionModifiers", "bvc2.LexerCode.TokenType", "bvc2.Common.VariableModifiers" })
             sb.AppendLine($"static void Assert({type} a, {type} b, string fieldName, HashSet<object> done) {{")
                 .Append("if(a != b)").AppendThrowLine()
                 .AppendLine("}");
 
-        sb.AppendLine("static void Assert(FunctionArgument a, FunctionArgument b, string fieldName, HashSet<object> done) {")
+        sb.AppendLine("static void Assert(FunctionSyntaxParameter a, FunctionSyntaxParameter b, string fieldName, HashSet<object> done) {")
+            .AppendLine("Assert(a.Modifiers, b.Modifiers, fieldName, done);")
+            .AppendLine("Assert(a.Name, b.Name, fieldName, done);")
+            .AppendLine("Assert(a.Type, b.Type, fieldName, done);")
+            .AppendLine("}");
+
+        sb.AppendLine("static void Assert(FunctionSemanticParameter a, FunctionSemanticParameter b, string fieldName, HashSet<object> done) {")
             .AppendLine("Assert(a.Modifiers, b.Modifiers, fieldName, done);")
             .AppendLine("Assert(a.Name, b.Name, fieldName, done);")
             .AppendLine("Assert(a.Type, b.Type, fieldName, done);")

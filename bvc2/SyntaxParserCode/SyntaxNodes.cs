@@ -17,16 +17,9 @@ record ClassSyntaxNode(string Name, string[]? GenericTypes = null) : ParentSynta
 
 record BlockSyntaxNode : ParentSyntaxNode;
 
-[Flags]
-enum FunctionModifiers
-{
-    None = 0,
-    Static = 1 << 0,
-}
+record FunctionSyntaxParameter(VariableModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode Type);
 
-record FunctionArgument(VariableModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode Type);
-
-record FunctionDeclarationSyntaxNode(FunctionModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode? ReturnType, FunctionArgument[] Arguments, bool Internal = false)
+record FunctionDeclarationSyntaxNode(FunctionModifiers Modifiers, string Name, IdentifierExpressionSyntaxNode? ReturnType, FunctionSyntaxParameter[] Arguments, bool Internal = false)
     : BlockSyntaxNode
 {
     public const string PrimaryConstructorName = ".ctor";
