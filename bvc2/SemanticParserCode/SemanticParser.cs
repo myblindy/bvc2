@@ -45,8 +45,15 @@ internal class SemanticParser
         ParseChildren(node, classEntry);
     }
 
-    static void ParseVariableSyntaxNode(VariableSyntaxNode node, SemanticEntry parent) =>
-        parent.Children.Add(new VariableSemanticEntry(node.Modifiers, node.Name, parent.FindType(node.ReturnType!), GetSemanticExpression(node.InitialValue, parent)));
+    static void ParseVariableSyntaxNode(VariableSyntaxNode node, SemanticEntry parent)
+    {
+        var initialValueExpression = GetSemanticExpression(node.InitialValue, parent);
+        var type = parent.FindType(node.ReturnType!) ?? initialValueExpression?.Type;
+        if ((type is not null || initialValueExpression?.Type is not null) && type != initialValueExpression?.Type)
+            throw new InvalidOperationException($"Variable initial value is of type {initialValueExpression?.Type} and it's different than the provided variable type of {type}.");
+
+        parent.Children.Add(new VariableSemanticEntry(node.Modifiers, node.Name, type, initialValueExpression));
+    }
 
     static void ParseChildren(ParentSyntaxNode node, SemanticEntry parent)
     {
@@ -67,42 +74,20 @@ internal class SemanticParser
             }
     }
 
-    static readonly ClassSemanticEntry integerSemanticEntry = new("Integer", Array.Empty<string>())
-    {
-        Internal = true,
-        Children =
-        {
-            new FunctionSemanticEntry(FunctionModifiers.Static, "+", Array.Empty<string>(), integerSemanticEntry, new FunctionSemanticParameter[]
-            {
-                new(VariableModifiers.Val, "a", integerSemanticEntry),
-                new(VariableModifiers.Val, "b", integerSemanticEntry)
-            })
-        }
-    };
-    static readonly ClassSemanticEntry doubleSemanticEntry = new("Double", Array.Empty<string>())
-    {
-        Internal = true,
-        Children =
-        {
+    static readonly ClassSemanticEntry integerSemanticEntry = new(BasicTypeNames.Integer, Array.Empty<string>()) { Internal = true };
+    static readonly ClassSemanticEntry doubleSemanticEntry = new(BasicTypeNames.Double, Array.Empty<string>()) { Internal = true };
+    static readonly ClassSemanticEntry stringSemanticEntry = new(BasicTypeNames.String, Array.Empty<string>()) { Internal = true };
+    static readonly ClassSemanticEntry booleanSemanticEntry = new(BasicTypeNames.Boolean, Array.Empty<string>()) { Internal = true };
 
-        }
-    };
-    static readonly ClassSemanticEntry stringSemanticEntry = new("String", Array.Empty<string>())
+    static SemanticParser()
     {
-        Internal = true,
-        Children =
+        integerSemanticEntry.Children.Add(new FunctionSemanticEntry(FunctionModifiers.Static, "+", Array.Empty<string>(), integerSemanticEntry, new FunctionSemanticParameter[]
         {
+            new(VariableModifiers.Val, "a", integerSemanticEntry),
+            new(VariableModifiers.Val, "b", integerSemanticEntry),
+        }));
+    }
 
-        }
-    };
-    static readonly ClassSemanticEntry booleanSemanticEntry = new("Boolean", Array.Empty<string>())
-    {
-        Internal = true,
-        Children =
-        {
-
-        }
-    };
     static void AppendRuntimeTypeSemanticEntries(RootSemanticEntry root)
     {
         root.Children.Add(integerSemanticEntry);

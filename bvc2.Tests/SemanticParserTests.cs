@@ -29,7 +29,7 @@ enum E { V0, V1 = 5, V2, V3 = 0, V4 }
 
         var result = parser.Parse();
 
-        var typeInteger = result.FindType("Integer");
+        var typeInteger = result.FindType(BasicTypeNames.Integer);
         var typeE = new EnumSemanticEntry("E");
         typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V0", typeE, new LiteralSemanticExpression(0L, typeInteger)));
         typeE.Children.Add(new VariableSemanticEntry(VariableModifiers.Enum, "V1", typeE, new LiteralSemanticExpression(5L, typeInteger)));
@@ -54,7 +54,7 @@ class C
 ");
         var result = parser.Parse();
 
-        var typeInteger = result.FindType("Integer");
+        var typeInteger = result.FindType(BasicTypeNames.Integer);
         var typeC = new ClassSemanticEntry("C", Array.Empty<string>());
         typeC.Children.Add(new VariableSemanticEntry(VariableModifiers.None, "a", typeInteger,
             new BinarySemanticExpression(

@@ -84,8 +84,8 @@ class C(var i: Integer, val d: Double);
                     {
                         new FunctionDeclarationSyntaxNode(FunctionModifiers.None, FunctionDeclarationSyntaxNode.PrimaryConstructorName, null, new FunctionSyntaxParameter[]
                         {
-                            new(VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode("Integer")),
-                            new(VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode("Double")),
+                            new(VariableModifiers.None, "i", new IdentifierExpressionSyntaxNode(BasicTypeNames.Integer)),
+                            new(VariableModifiers.Val, "d", new IdentifierExpressionSyntaxNode(BasicTypeNames.Double)),
                         })
                     }
                 }

@@ -13,10 +13,58 @@ abstract class SemanticEntry
     public SemanticEntry(string? name) =>
         (Name, Children) = (name, new(this));
 
-    public TypeSemanticEntry? FindType(ExpressionSyntaxNode expressionSyntaxNode) => null;
+    public SemanticEntry Root
+    {
+        get
+        {
+            var p = this;
+            while (p.Parent is not null)
+                p = p.Parent;
+            return p;
+        }
+    }
 
-    public TypeSemanticEntry? FindType(string name) =>
-        Children.OfType<TypeSemanticEntry>().FirstOrDefault(t => t.Name == name) ?? Parent?.FindType(name);
+    public FunctionSemanticEntry? FindFunction(ExpressionSyntaxNode? identifier, TypeSemanticEntry[] parameterTypes)
+    {
+        if (identifier is not LiteralExpressionSyntaxNode { Value: string } literalExpressionSyntaxNode)
+            return null;
+
+        return Children.OfType<FunctionSemanticEntry>().FirstOrDefault(f =>
+            f.Name == (string)literalExpressionSyntaxNode.Value && f.Parameters.Select(w => w.Type).SequenceEqual(parameterTypes));
+    }
+
+    public TypeSemanticEntry? FindType(ExpressionSyntaxNode? identifier)
+    {
+        switch (identifier)
+        {
+            case null: return null;
+            case LiteralExpressionSyntaxNode { Value: string } stringLiteralExpressionSyntaxNode:
+                return Children.OfType<TypeSemanticEntry>().FirstOrDefault(t => t.Name == (string)stringLiteralExpressionSyntaxNode.Value) ?? Parent?.FindType(identifier);
+            case LiteralExpressionSyntaxNode literalExpressionSyntaxNode:
+                return literalExpressionSyntaxNode.Value switch
+                {
+                    long longValue => Root.FindType(BasicTypeNames.Integer),
+                    double doubleValue => Root.FindType(BasicTypeNames.Double),
+                    _ => throw new NotImplementedException()
+                };
+            case BinaryExpressionSyntaxNode binaryExpressionSyntaxNode:
+                var leftType = FindType(binaryExpressionSyntaxNode.Left);
+                if (leftType is null) return null;
+                var rightType = FindType(binaryExpressionSyntaxNode.Right);
+                if (rightType is null) return null;
+
+                var name = binaryExpressionSyntaxNode.Operator switch
+                {
+                    TokenType.Plus => "+",
+                    _ => throw new NotImplementedException()
+                };
+                return leftType.FindFunction(new LiteralExpressionSyntaxNode(name), new[] { leftType, rightType })?.ReturnType
+                    ?? rightType.FindFunction(new LiteralExpressionSyntaxNode(name), new[] { leftType, rightType })?.ReturnType;
+            default: throw new NotImplementedException();
+        }
+    }
+
+    public TypeSemanticEntry? FindType(string name) => FindType(new LiteralExpressionSyntaxNode(name));
 }
 
 class SemanticEntryCollection : Collection<SemanticEntry>
